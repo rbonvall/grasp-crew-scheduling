@@ -2,7 +2,10 @@
 
 from collections import defaultdict
 range = xrange
-from collections import namedtuple
+try:
+    from collections import namedtuple
+except ImportError:
+    from namedtuple import namedtuple
 
 Task = namedtuple('Task', ['start', 'finish'])
 
