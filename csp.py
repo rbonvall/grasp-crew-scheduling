@@ -2,6 +2,9 @@
 
 from collections import defaultdict
 range = xrange
+from collections import namedtuple
+
+Task = namedtuple('Task', ['start', 'finish'])
 
 class CrewSchedulingProblem:
     """Crew Scheduling problem instance from ORLIB."""
@@ -10,7 +13,7 @@ class CrewSchedulingProblem:
         nr_tasks, time_limit = file_contents.pop(0)
 
         self.time_limit = time_limit
-        self.tasks = file_contents[:nr_tasks]
+        self.tasks = [Task(*t) for t in file_contents[:nr_tasks]]
         self.transition_costs = defaultdict(lambda: float('inf'))
         self.possible_transitions = [list() for task in self.tasks]
         for i, j, cost in file_contents[nr_tasks:]:
@@ -26,8 +29,8 @@ class CrewSchedulingProblem:
 
         for task in candidates:
             rotation = from_rotation + (task,)
-            start_time, _  = self.tasks[rotation[0]]
-            _, finish_time = self.tasks[rotation[-1]]
+            start_time  = self.tasks[rotation[0]].start
+            finish_time = self.tasks[rotation[-1]].finish
             if finish_time - start_time > self.time_limit:
                 continue
             
