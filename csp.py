@@ -70,9 +70,8 @@ def main():
     print 'Problem size: %d' % len(csp.tasks)
     print 'Time limit: %d  ' % csp.time_limit
     print 'Transitions: %d ' % len(csp.transition_costs)
+    print
 
-    # test generation of rotations
-    data = []
     try:
         from ptable import Table
     except ImportError:
