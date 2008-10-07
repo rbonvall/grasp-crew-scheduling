@@ -30,7 +30,7 @@ def construct_solution(rotations, csp):
                      if not (r.tasks & selected_rotation.tasks)]
         DEBUG('%d candidates remaining' % len(rotations))
         if sum(map(len, [r.tasks for r in solution])) == len(csp.tasks):
-            DEBUG('SOLUTION DONE:')
+            DEBUG('SOLUTION WITH %d ROTATIONS:' % len(solution))
             for r in solution: print r.tasks,
             print
             break
