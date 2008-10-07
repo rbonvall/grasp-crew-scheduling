@@ -1,26 +1,23 @@
 #!/usr/bin/env python
 
 from csp import CrewSchedulingProblem
-from random import choice
+from random import choice, random
+from functools import partial
 range = xrange
-
-# parameter for greedy cost function
-per_task_bonification = 300
 
 def DEBUG(s): print s
 
-def element_cost(r):
-    """Cost of adding an element to a solution"""
-    return -per_task_bonification * len(r.tasks) + r.cost
+def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
+    """Cost of adding a rotation to a solution"""
+    return (-per_task_bonification * len(r.tasks) +
+             perturbation_radius * random() +
+             r.cost)
 
-def construct_solution(rotations, csp):
-    # make a copy to use 2nd column as marginal cost
+def construct_solution(rotations, csp, greedy_cost):
     rotations = rotations[:]
-
-    R = len(rotations)
     solution = []
     while True:
-        rcl = sorted(rotations, key=lambda r: element_cost(r))[:10]
+        rcl = sorted(rotations, key=greedy_cost)[:10]
         selected_rotation = choice(rcl)
         DEBUG('Selection from RCL: %s' % str(selected_rotation))
         solution.append(selected_rotation)
@@ -43,9 +40,11 @@ def local_search(solution):
     return solution
 
 def grasp(rotations, csp, max_iterations=1):
+    greedy_cost = partial(rotation_cost,
+                          per_task_bonification=300, perturbation_radius=0)
     best_solution = None
     for i in range(max_iterations):
-        solution = construct_solution(rotations, csp)
+        solution = construct_solution(rotations, csp, greedy_cost)
         solution = local_search(solution)
         best_solution = solution
         break
