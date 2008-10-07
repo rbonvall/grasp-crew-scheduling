@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from collections import defaultdict
+from itertools import izip as zip
 range = xrange
 try:
     from collections import namedtuple
@@ -8,6 +9,7 @@ except ImportError:
     from namedtuple import namedtuple
 
 Task = namedtuple('Task', ['start', 'finish'])
+Rotation = namedtuple('Rotation', ['tasks', 'cost', 'duration'])
 
 class CrewSchedulingProblem:
     """Crew Scheduling problem instance from ORLIB."""
@@ -34,10 +36,13 @@ class CrewSchedulingProblem:
             rotation = from_rotation + (task,)
             start_time  = self.tasks[rotation[0]].start
             finish_time = self.tasks[rotation[-1]].finish
-            if finish_time - start_time > self.time_limit:
+            duration = finish_time - start_time
+            if duration > self.time_limit:
                 continue
-            
-            yield rotation
+            print "***", rotation
+            cost = sum(self.transition_costs[t] for t in zip(rotation, rotation[1:]))
+            yield Rotation(rotation, cost, duration)
+
             for r in self.generate_rotations(rotation):
                 yield r
 
@@ -68,27 +73,19 @@ def main():
 
     # test generation of rotations
     data = []
-    for n, rotation in enumerate(csp.generate_rotations()):
-        cost = sum(csp.transition_costs[t] for t in zip(rotation, rotation[1:]))
-        start_time, _  = csp.tasks[rotation[0]]
-        _, finish_time = csp.tasks[rotation[-1]]
-        duration = finish_time - start_time
-        r = str(tuple(x+1 for x in rotation))
-        data.append((r, cost, duration))
-
     try:
         from ptable import Table
     except ImportError:
         pass
     else:
-        t = Table(data)
+        t = Table(csp.generate_rotations())
         t.headers = ('Rotation', 'Cost', 'Duration')
         t.align = 'lrr'
         t.col_separator = ' | '
         t.repeat_headers_after = 25
         t.header_separator = True
         t.print_table()
-    print '# of rotations: %d' % (n + 1)
+    print '# of rotations: %d' % (len(t.data))
 
 if __name__ == '__main__':
     main()
