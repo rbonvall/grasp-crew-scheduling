@@ -1,10 +1,40 @@
 #!/usr/bin/env python
 
 from csp import CrewSchedulingProblem
+from random import choice
 range = xrange
 
+def DEBUG(s): print s
+
+def element_cost(r):
+    """Cost of adding an element to a solution"""
+    return r.cost
+
 def construct_solution(rotations, csp):
-    pass
+    # make a copy to use 2nd column as marginal cost
+    rotations = rotations[:]
+
+    R = len(rotations)
+    solution = []
+    while True:
+        rcl = sorted(rotations, key=lambda r: element_cost(r))[:10]
+        selected_rotation = choice(rcl)
+        DEBUG('Selection from RCL: %s' % str(selected_rotation))
+        solution.append(selected_rotation)
+
+        # reevaluate candidates
+        rotations = [r for r in rotations
+                     if not (r.tasks & selected_rotation.tasks)]
+        DEBUG('%d candidates remaining' % len(rotations))
+        if sum(map(len, [r.tasks for r in solution])) == len(csp.tasks):
+            DEBUG('SOLUTION DONE:')
+            for r in solution: print r.tasks,
+            print
+            break
+        if not rotations:
+            DEBUG('NOT A FEASIBLE SOLUTION')
+            break
+    return solution
 
 def local_search(solution):
     return solution
