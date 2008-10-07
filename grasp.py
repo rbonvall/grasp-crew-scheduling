@@ -16,8 +16,13 @@ def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
 def construct_solution(rotations, csp, greedy_cost):
     rotations = rotations[:]
     solution = []
+    alpha = 0.8
     while True:
-        rcl = sorted(rotations, key=greedy_cost)[:10]
+        min_cost = greedy_cost(min(rotations, key=greedy_cost))
+        max_cost = greedy_cost(max(rotations, key=greedy_cost))
+        threshold = min_cost + alpha * (max_cost - min_cost)
+        #rcl = sorted(rotations, key=greedy_cost)[:10]
+        rcl = [r for r in rotations if greedy_cost(r) < threshold]
         selected_rotation = choice(rcl)
         DEBUG('Selection from RCL: %s' % str(selected_rotation))
         solution.append(selected_rotation)
