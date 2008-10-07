@@ -52,7 +52,11 @@ def grasp(rotations, csp, max_iterations=1):
     return best_solution
 
 def main():
-    filename = "orlib/csp50.txt"
+    import sys
+    try:
+        filename = sys.argv[1]
+    except IndexError:
+        filename = 'orlib/csp50.txt'
     csp = CrewSchedulingProblem(open(filename))
     rotations = list(csp.generate_rotations())
     solution = grasp(rotations, csp)
