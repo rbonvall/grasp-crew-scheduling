@@ -11,6 +11,10 @@ except ImportError:
 Task = namedtuple('Task', ['start', 'finish'])
 Rotation = namedtuple('Rotation', ['tasks', 'cost', 'duration'])
 
+# hack for nice set printing
+class set(set):
+    __repr__ = lambda self: '{%s}' % str.join(', ', map(str, sorted(self)))
+
 class CrewSchedulingProblem:
     """Crew Scheduling problem instance from ORLIB."""
     def __init__(self, input_file):
