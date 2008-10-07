@@ -39,9 +39,8 @@ class CrewSchedulingProblem:
             duration = finish_time - start_time
             if duration > self.time_limit:
                 continue
-            print "***", rotation
             cost = sum(self.transition_costs[t] for t in zip(rotation, rotation[1:]))
-            yield Rotation(rotation, cost, duration)
+            yield Rotation(set(rotation), cost, duration)
 
             for r in self.generate_rotations(rotation):
                 yield r
