@@ -12,7 +12,7 @@ Task = namedtuple('Task', ['start', 'finish'])
 Rotation = namedtuple('Rotation', ['tasks', 'cost', 'duration'])
 
 # hack for nice set printing
-class set(set):
+class frozenset(frozenset):
     __repr__ = lambda self: '{%s}' % str.join(', ', map(str, sorted(self)))
 
 class CrewSchedulingProblem:
@@ -44,7 +44,7 @@ class CrewSchedulingProblem:
             if duration > self.time_limit:
                 continue
             cost = sum(self.transition_costs[t] for t in zip(rotation, rotation[1:]))
-            yield Rotation(set(rotation), cost, duration)
+            yield Rotation(frozenset(rotation), cost, duration)
 
             for r in self.generate_rotations(rotation):
                 yield r
