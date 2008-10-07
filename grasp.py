@@ -4,11 +4,14 @@ from csp import CrewSchedulingProblem
 from random import choice
 range = xrange
 
+# parameter for greedy cost function
+per_task_bonification = 300
+
 def DEBUG(s): print s
 
 def element_cost(r):
     """Cost of adding an element to a solution"""
-    return r.cost
+    return -per_task_bonification * len(r.tasks) + r.cost
 
 def construct_solution(rotations, csp):
     # make a copy to use 2nd column as marginal cost
