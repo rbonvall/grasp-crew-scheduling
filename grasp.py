@@ -77,17 +77,20 @@ def grasp(rotations, csp, alpha, greedy_cost, max_iterations=1):
     return best_solution
 
 def main():
-    import sys
-    try:
-        filename = sys.argv[1]
-    except IndexError:
-        filename = 'orlib/csp50.txt'
-    csp = CrewSchedulingProblem(open(filename))
+    from optparse import OptionParser
+    parser = OptionParser(usage="usage: %prog [options] [input_file]")
+    parser.add_option('-a', '--alpha', type='float', default=0.3, metavar='NUM', help='Alpha parameter for RCL construction')
+    parser.add_option('-b', '--ptb',   type='float', default=300, metavar='NUM', help='Per task bonification in greedy function')
+    parser.add_option('-p', '--pertr', type='float', default=0,   metavar='NUM', help='Cost perturbation radius in greedy function')
+    (options, args) = parser.parse_args()
+    if not args:
+        args = ['orlib/csp50.txt']
+
+    csp = CrewSchedulingProblem(open(args[0]))
     rotations = list(csp.generate_rotations())
 
-    alpha = 0.3
-    greedy_cost = partial(rotation_cost, per_task_bonification=300, perturbation_radius=0)
-    solution = grasp(rotations, csp, alpha, greedy_cost)
+    greedy_cost = partial(rotation_cost, per_task_bonification=options.ptb, perturbation_radius=options.pertr)
+    solution = grasp(rotations, csp, options.alpha, greedy_cost)
 
 if __name__ == '__main__':
     main()
