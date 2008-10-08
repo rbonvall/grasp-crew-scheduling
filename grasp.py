@@ -6,6 +6,23 @@ from functools import partial
 range = xrange
 
 def DEBUG(s): print s
+def DEBUG_RCL(rotations, rcl, selected_rotation, min_cost, max_cost, greedy_cost):
+    data = (len(rotations), len(rcl), min_cost, max_cost)
+    DEBUG('#rotations: %d, #rcl: %d, min_cost: %d, max_cost: %d' % data)
+    rotation_reprs = []
+    for r in rotations:
+        r_repr = '%s:%d' % (str(r.tasks), greedy_cost(r))
+        if r in rcl:
+            c = int(r == selected_rotation)
+            if greedy_cost(r) == min_cost:
+                r_repr = '\033[%d;40;32m%s\033[0m' % (c, r_repr)
+            else:
+                r_repr = '\033[%d;40;36m%s\033[0m' % (c, r_repr)
+        if greedy_cost(r) == max_cost:
+            r_repr = '\033[0;40;31m%s\033[0m' % r_repr
+        rotation_reprs.append(r_repr)
+    DEBUG(' '.join(rotation_reprs))
+
 
 def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
     """Cost of adding a rotation to a solution"""
@@ -24,13 +41,13 @@ def construct_solution(rotations, csp, greedy_cost):
         #rcl = sorted(rotations, key=greedy_cost)[:10]
         rcl = [r for r in rotations if greedy_cost(r) < threshold]
         selected_rotation = choice(rcl)
-        DEBUG('Selection from RCL: %s' % str(selected_rotation))
         solution.append(selected_rotation)
+
+        DEBUG_RCL(rotations, rcl, selected_rotation, min_cost, max_cost, greedy_cost)
 
         # reevaluate candidates
         rotations = [r for r in rotations
                      if not (r.tasks & selected_rotation.tasks)]
-        DEBUG('%d candidates remaining' % len(rotations))
         if sum(map(len, [r.tasks for r in solution])) == len(csp.tasks):
             DEBUG('SOLUTION WITH %d ROTATIONS:' % len(solution))
             for r in solution: print r.tasks,
