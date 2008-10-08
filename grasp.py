@@ -3,25 +3,25 @@
 from csp import CrewSchedulingProblem
 from random import choice, random
 from functools import partial
+from sys import stdout
 range = xrange
 
 def DEBUG(s): print s
-def DEBUG_RCL(rotations, rcl, selected_rotation, min_cost, max_cost, greedy_cost):
+def DEBUG_RCL(rotations, rcl, selected_rotation,
+              min_cost, max_cost, greedy_cost, stream=stdout):
     data = (len(rotations), len(rcl), min_cost, max_cost)
-    DEBUG('#rotations: %d, #rcl: %d, min_cost: %d, max_cost: %d' % data)
-    rotation_reprs = []
-    for r in rotations:
-        r_repr = '%s:%d' % (str(r.tasks), greedy_cost(r))
+    stream.write('#rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
+    def r_repr(r):
+        s = '%s:%d:%d' % (str(r.tasks), r.cost, greedy_cost(r))
+        bold = 1 if r == selected_rotation else 0
+        color = 31 if greedy_cost(r) == max_cost else None
         if r in rcl:
-            c = int(r == selected_rotation)
-            if greedy_cost(r) == min_cost:
-                r_repr = '\033[%d;40;32m%s\033[0m' % (c, r_repr)
-            else:
-                r_repr = '\033[%d;40;36m%s\033[0m' % (c, r_repr)
-        if greedy_cost(r) == max_cost:
-            r_repr = '\033[0;40;31m%s\033[0m' % r_repr
-        rotation_reprs.append(r_repr)
-    DEBUG(' '.join(rotation_reprs))
+            color = 32 if greedy_cost(r) == min_cost else 36
+        if color:
+            return '\033[%d;40;%dm%s\033[0m' % (bold, color, s)
+        return s
+    stream.write(' '.join(r_repr(r) for r in rotations))
+    stream.write('\n')
 
 
 def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
