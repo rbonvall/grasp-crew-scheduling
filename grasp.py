@@ -1,27 +1,32 @@
 #!/usr/bin/env python
 
-from csp import CrewSchedulingProblem
+from csp import CrewSchedulingProblem, namedtuple
 from random import choice, random
 from functools import partial
+from operator import attrgetter
 from sys import stdout
 range = xrange
 
+Candidate = namedtuple('Candidate', 'rotation, greedy_cost')
+
 def DEBUG(s): print s
 
-def DEBUG_RCL(rotations, rcl, selected_rotation,
-              min_cost, max_cost, greedy_cost, stream=stdout):
-    data = (len(rotations), len(rcl), min_cost, max_cost)
-    def r_repr(r):
-        s = '%s:%d:%d' % (str(r.tasks), r.cost, greedy_cost(r))
-        bold = 1 if r == selected_rotation else 0
-        color = 31 if greedy_cost(r) == max_cost else None
-        if r in rcl:
-            color = 32 if greedy_cost(r) == min_cost else 36
+def DEBUG_RCL(candidates, rcl, selected_candidate, stream=stdout):
+    min_cost = candidates[0].greedy_cost
+    max_cost = candidates[-1].greedy_cost
+    def c_repr(c):
+        r = c.rotation
+        s = '%s:%d:%d' % (str(r.tasks), r.cost, c.greedy_cost)
+        bold = 1 if c == selected_candidate else 0
+        color = 31 if c.greedy_cost == max_cost else None
+        if c in rcl:
+            color = 32 if c.greedy_cost == min_cost else 36
         if color:
             return '\033[%d;40;%dm%s\033[0m' % (bold, color, s)
         return s
-    stream.write('#rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
-    stream.write(' '.join(r_repr(r) for r in rotations))
+    data = (len(candidates), len(rcl), min_cost, max_cost)
+    stream.write('#candidate rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
+    stream.write(' '.join(c_repr(c) for c in candidates))
     stream.write('\n')
 
 def DEBUG_SOLUTION(rotations, stream=stdout):
@@ -41,25 +46,26 @@ def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
              r.cost)
 
 def construct_solution(rotations, csp, greedy_cost, alpha):
-    rotations = sorted(rotations, key=greedy_cost)
+    candidates = sorted((Candidate(r, greedy_cost(r)) for r in rotations),
+                        key=attrgetter('greedy_cost'))
     solution = []
     while True:
-        min_cost = greedy_cost(rotations[0])
-        max_cost = greedy_cost(rotations[-1])
+        min_cost = candidates[0].greedy_cost
+        max_cost = candidates[-1].greedy_cost
         threshold = min_cost + alpha * (max_cost - min_cost)
-        rcl = [r for r in rotations if greedy_cost(r) <= threshold]
-        selected_rotation = choice(rcl)
-        solution.append(selected_rotation)
+        rcl = [c for c in candidates if c.greedy_cost <= threshold]
+        selected_candidate = choice(rcl)
+        solution.append(selected_candidate.rotation)
 
-        DEBUG_RCL(rotations, rcl, selected_rotation, min_cost, max_cost, greedy_cost)
+        DEBUG_RCL(candidates, rcl, selected_candidate)
 
         # reevaluate candidates
-        rotations = [r for r in rotations
-                     if not (r.tasks & selected_rotation.tasks)]
+        candidates = [c for c in candidates
+                      if not (c.rotation.tasks & selected_candidate.rotation.tasks)]
         if sum(len(r.tasks) for r in solution) == len(csp.tasks):
             DEBUG_SOLUTION(solution)
             break
-        elif not rotations:
+        elif not candidates:
             DEBUG('NOT A FEASIBLE SOLUTION')
             return None
     return solution
