@@ -10,7 +10,6 @@ def DEBUG(s): print s
 def DEBUG_RCL(rotations, rcl, selected_rotation,
               min_cost, max_cost, greedy_cost, stream=stdout):
     data = (len(rotations), len(rcl), min_cost, max_cost)
-    stream.write('#rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
     def r_repr(r):
         s = '%s:%d:%d' % (str(r.tasks), r.cost, greedy_cost(r))
         bold = 1 if r == selected_rotation else 0
@@ -20,6 +19,7 @@ def DEBUG_RCL(rotations, rcl, selected_rotation,
         if color:
             return '\033[%d;40;%dm%s\033[0m' % (bold, color, s)
         return s
+    stream.write('#rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
     stream.write(' '.join(r_repr(r) for r in rotations))
     stream.write('\n')
 
