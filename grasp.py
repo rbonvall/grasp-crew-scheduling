@@ -49,7 +49,10 @@ def construct_solution(rotations, csp, greedy_cost, alpha):
     candidates = sorted((Candidate(r, greedy_cost(r)) for r in rotations),
                         key=attrgetter('greedy_cost'))
     solution = []
-    while True:
+    while sum(len(r.tasks) for r in solution) < len(csp.tasks):
+        if not candidates:
+            return None
+
         min_cost = candidates[0].greedy_cost
         max_cost = candidates[-1].greedy_cost
         threshold = min_cost + alpha * (max_cost - min_cost)
@@ -62,12 +65,7 @@ def construct_solution(rotations, csp, greedy_cost, alpha):
         # reevaluate candidates
         candidates = [c for c in candidates
                       if not (c.rotation.tasks & selected_candidate.rotation.tasks)]
-        if sum(len(r.tasks) for r in solution) == len(csp.tasks):
-            DEBUG_SOLUTION(solution)
-            break
-        elif not candidates:
-            DEBUG('NOT A FEASIBLE SOLUTION')
-            return None
+    DEBUG_SOLUTION(solution)
     return solution
 
 def local_search(solution):
