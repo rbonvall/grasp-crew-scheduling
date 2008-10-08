@@ -40,10 +40,9 @@ def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
              perturbation_radius * random() +
              r.cost)
 
-def construct_solution(rotations, csp, greedy_cost):
+def construct_solution(rotations, csp, greedy_cost, alpha):
     rotations = sorted(rotations, key=greedy_cost)
     solution = []
-    alpha = 0.3
     while True:
         min_cost = greedy_cost(rotations[0])
         max_cost = greedy_cost(rotations[-1])
@@ -69,12 +68,10 @@ def construct_solution(rotations, csp, greedy_cost):
 def local_search(solution):
     return solution
 
-def grasp(rotations, csp, max_iterations=1):
-    greedy_cost = partial(rotation_cost,
-                          per_task_bonification=300, perturbation_radius=0)
+def grasp(rotations, csp, alpha, greedy_cost, max_iterations=1):
     best_solution = None
     for i in range(max_iterations):
-        solution = construct_solution(rotations, csp, greedy_cost)
+        solution = construct_solution(rotations, csp, greedy_cost, alpha)
         solution = local_search(solution)
         best_solution = solution
         break
@@ -88,7 +85,10 @@ def main():
         filename = 'orlib/csp50.txt'
     csp = CrewSchedulingProblem(open(filename))
     rotations = list(csp.generate_rotations())
-    solution = grasp(rotations, csp)
+
+    alpha = 0.3
+    greedy_cost = partial(rotation_cost, per_task_bonification=300, perturbation_radius=0)
+    solution = grasp(rotations, csp, alpha, greedy_cost)
 
 if __name__ == '__main__':
     main()
