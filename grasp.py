@@ -7,6 +7,7 @@ from sys import stdout
 range = xrange
 
 def DEBUG(s): print s
+
 def DEBUG_RCL(rotations, rcl, selected_rotation,
               min_cost, max_cost, greedy_cost, stream=stdout):
     data = (len(rotations), len(rcl), min_cost, max_cost)
@@ -23,6 +24,15 @@ def DEBUG_RCL(rotations, rcl, selected_rotation,
     stream.write(' '.join(r_repr(r) for r in rotations))
     stream.write('\n')
 
+def DEBUG_SOLUTION(rotations, stream=stdout):
+    cost = sum(r.cost for r in rotations)
+    nr_rotations = len(rotations)
+    stream.write('SOLUTION FOUND cost:%d, nr_rotations: %d\n' %
+            (cost, nr_rotations))
+    stream.write(' '.join(str(r.tasks) for r in rotations))
+    stream.write('\n')
+    
+
 
 def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
     """Cost of adding a rotation to a solution"""
@@ -33,7 +43,7 @@ def rotation_cost(r, per_task_bonification=0, perturbation_radius=0):
 def construct_solution(rotations, csp, greedy_cost):
     rotations = sorted(rotations, key=greedy_cost)
     solution = []
-    alpha = 0.8
+    alpha = 0.3
     while True:
         min_cost = greedy_cost(rotations[0])
         max_cost = greedy_cost(rotations[-1])
@@ -48,14 +58,12 @@ def construct_solution(rotations, csp, greedy_cost):
         # reevaluate candidates
         rotations = [r for r in rotations
                      if not (r.tasks & selected_rotation.tasks)]
-        if sum(map(len, [r.tasks for r in solution])) == len(csp.tasks):
-            DEBUG('SOLUTION WITH %d ROTATIONS:' % len(solution))
-            for r in solution: print r.tasks,
-            print
+        if sum(len(r.tasks) for r in solution) == len(csp.tasks):
+            DEBUG_SOLUTION(solution)
             break
-        if not rotations:
+        elif not rotations:
             DEBUG('NOT A FEASIBLE SOLUTION')
-            break
+            return None
     return solution
 
 def local_search(solution):
