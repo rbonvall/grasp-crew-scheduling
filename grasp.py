@@ -39,7 +39,7 @@ def construct_solution(rotations, csp, greedy_cost):
         max_cost = greedy_cost(max(rotations, key=greedy_cost))
         threshold = min_cost + alpha * (max_cost - min_cost)
         #rcl = sorted(rotations, key=greedy_cost)[:10]
-        rcl = [r for r in rotations if greedy_cost(r) < threshold]
+        rcl = [r for r in rotations if greedy_cost(r) <= threshold]
         selected_rotation = choice(rcl)
         solution.append(selected_rotation)
 
