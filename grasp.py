@@ -9,8 +9,6 @@ range = xrange
 
 Candidate = namedtuple('Candidate', 'rotation, greedy_cost')
 
-def DEBUG(s): print s
-
 def DEBUG_RCL(candidates, rcl, selected_candidate, stream=stdout):
     min_cost = candidates[0].greedy_cost
     max_cost = candidates[-1].greedy_cost
