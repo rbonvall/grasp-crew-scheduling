@@ -20,7 +20,7 @@ def DEBUG_RCL(candidates, rcl, selected_candidate, stream=stdout):
         if c in rcl:
             color = 32 if c.greedy_cost == min_cost else 36
         if color:
-            return '\033[%d;40;%dm%s\033[0m' % (bold, color, s)
+            return '\033[%d;49;%dm%s\033[0m' % (bold, color, s)
         return s
     data = (len(candidates), len(rcl), min_cost, max_cost)
     stream.write('#candidate rotations: %d, #rcl: %d, cost range: [%d, %d]\n' % data)
