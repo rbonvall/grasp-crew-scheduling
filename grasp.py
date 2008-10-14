@@ -84,9 +84,16 @@ def main():
     parser.add_option('-a', '--alpha', type='float', default=0.3, metavar='NUM', help='Alpha parameter for RCL construction')
     parser.add_option('-b', '--ptb',   type='float', default=300, metavar='NUM', help='Per task bonification in greedy function')
     parser.add_option('-p', '--pertr', type='float', default=0,   metavar='NUM', help='Cost perturbation radius in greedy function')
+    parser.add_option('--debug-greedy', action='store_true', help='Print debugging data for construction stage')
+    parser.add_option('--debug-search', action='store_true', help='Print debugging data for search stage')
     (options, args) = parser.parse_args()
     if not args:
         args = ['orlib/csp50.txt']
+
+    if not options.debug_greedy:
+        global DEBUG_SOLUTION, DEBUG_RCL
+        DEBUG_SOLUTION = lambda *args: None
+        DEBUG_RCL = lambda *args: None
 
     csp = CrewSchedulingProblem(open(args[0]))
     rotations = list(csp.generate_rotations())
