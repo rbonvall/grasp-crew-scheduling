@@ -7,15 +7,14 @@
 
 from csp import CrewSchedulingProblem, namedtuple
 from random import choice
-from numpy import array, random, equal
-from numpy import random
+import numpy
 from operator import attrgetter
 range = xrange
 
 class Solution:
     __slots__ = ['columns', 'fitness', 'unfitness']
     def __init__(self, columns):
-        self.columns = array(columns).astype('int8')
+        self.columns = numpy.array(columns).astype('int8')
         self.fitness = fitness(self.columns)
         self.unfitness = unfitness(self.columns)
     def __eq__(self, other):
@@ -53,7 +52,7 @@ def matching_selection(population):
     return (P1, P2)
 
 def uniform_crossover(P1, P2):
-    mask = random.randint(2, size=P1.size)
+    mask = numpy.random.randint(2, size=P1.size)
     child = mask * P1.columns + (1 - mask) * P2.columns
     return Solution(child)
 
