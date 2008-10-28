@@ -87,8 +87,20 @@ def ga(population_size, nr_iterations):
 
     
 def main():
+    from optparse import OptionParser
+    parser = OptionParser(usage="usage: %prog [options] [input_file]")
+    (options, args) = parser.parse_args()
+
     csp = CrewSchedulingProblem(open(args[0]))
-    rotations = list(csp.generate_rotations())
+    columns, costs = [], []
+    for rotation in csp.generate_rotations():
+        column = numpy.zeros(len(csp.tasks), dtype='int8')
+        for task in rotation.tasks:
+            column[task] = 1
+        columns.append(column)
+        costs.append(rotation.cost)
+    A = numpy.matrix(columns).transpose()
+    c = numpy.array(costs)
 
 if __name__ == '__main__':
     main()
