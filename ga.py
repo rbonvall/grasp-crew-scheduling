@@ -11,6 +11,20 @@ import numpy
 from operator import attrgetter
 range = xrange
 
+class Problem:
+    # fields: A, c
+    def __init__(self, problem_file):
+        csp = CrewSchedulingProblem(problem_file)
+        columns, costs = [], []
+        for rotation in csp.generate_rotations():
+            column = numpy.zeros(len(csp.tasks), dtype='int8')
+            for task in rotation.tasks:
+                column[task] = 1
+            columns.append(column)
+            costs.append(rotation.cost)
+        self.A = numpy.matrix(columns).transpose()
+        self.costs = numpy.array(costs)
+
 class Solution:
     __slots__ = ['columns', 'fitness', 'unfitness']
     def __init__(self, columns):
@@ -91,16 +105,7 @@ def main():
     parser = OptionParser(usage="usage: %prog [options] [input_file]")
     (options, args) = parser.parse_args()
 
-    csp = CrewSchedulingProblem(open(args[0]))
-    columns, costs = [], []
-    for rotation in csp.generate_rotations():
-        column = numpy.zeros(len(csp.tasks), dtype='int8')
-        for task in rotation.tasks:
-            column[task] = 1
-        columns.append(column)
-        costs.append(rotation.cost)
-    A = numpy.matrix(columns).transpose()
-    c = numpy.array(costs)
+    problem = Problem(open(args[0]))
 
 if __name__ == '__main__':
     main()
