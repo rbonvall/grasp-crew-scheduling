@@ -39,6 +39,9 @@ class Problem:
         self.alpha = map(frozenset, alpha)
         self.beta  = map(frozenset, beta)
 
+    def __repr__(self):
+        return '<CSP problem, %dx%d>' % (self.nr_rows, self.nr_cols)
+
     def initial_solution(self, population_size=1):
         solution = zeros((self.nr_cols, population_size), dtype='int8')
         I = frozenset(range(self.nr_rows))
