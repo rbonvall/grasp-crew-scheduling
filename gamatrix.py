@@ -39,6 +39,21 @@ class Problem:
         self.alpha = map(frozenset, alpha)
         self.beta  = map(frozenset, beta)
 
+    def initial_solution(self, population_size=1):
+        solution = zeros((self.nr_cols, population_size), dtype='int8')
+        I = frozenset(range(self.nr_rows))
+        for k in range(population_size):
+            S, U = set(), set(I)
+            while U:
+                i = choice(list(U))
+                J = [j for j in self.alpha[i] if not (self.beta[j] & (I - U))]
+                if J:
+                    j = choice(J)
+                    solution[j, k] = 1
+                    U -= self.beta[j]
+                else:
+                    U.remove(i)
+        return solution
 
 
 
