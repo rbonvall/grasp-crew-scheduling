@@ -5,7 +5,7 @@
 #     Constraint Handling in Genetic Algorithms: The Set Partitioning Problem.
 #     Journal of Heuristics, 11: 323--357 (1998)
 
-from csp import CrewSchedulingProblem, namedtuple
+from csp import CrewSchedulingProblem, namedtuple, frozenset
 from random import choice
 from operator import attrgetter
 from numpy import *
@@ -35,8 +35,9 @@ class Problem:
 
         self.A = A
         self.c = c
-        self.alpha = alpha
-        self.beta  = beta
+        self.nr_rows, self.nr_cols = m, n
+        self.alpha = map(frozenset, alpha)
+        self.beta  = map(frozenset, beta)
 
 
 
