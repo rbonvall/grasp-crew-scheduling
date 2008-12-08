@@ -24,7 +24,6 @@ class Problem:
             costs.append(rotation.cost)
 
         A = array(columns).transpose()
-        c = array(costs)
         m, n = A.shape
         
         alpha = [set() for row in range(m)]
@@ -34,7 +33,7 @@ class Problem:
             beta [col].add(row)
 
         self.A = A
-        self.c = c
+        self.rotation_costs = array(costs)
         self.nr_rows, self.nr_cols = m, n
         self.alpha = map(frozenset, alpha)
         self.beta  = map(frozenset, beta)
