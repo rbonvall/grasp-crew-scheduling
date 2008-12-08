@@ -17,7 +17,7 @@ class Problem:
         csp = CrewSchedulingProblem(problem_file)
         columns, costs = [], []
         for rotation in csp.generate_rotations():
-            column = zeros(len(csp.tasks), dtype='int8')
+            column = zeros(len(csp.tasks), dtype='uint8')
             for task in rotation.tasks:
                 column[task] = 1
             columns.append(column)
@@ -44,7 +44,7 @@ class Problem:
 
 
 def initial_solution(problem, population_size=1):
-    solution = zeros((problem.nr_cols, population_size), dtype='int8')
+    solution = zeros((problem.nr_cols, population_size), dtype='uint8')
     I = frozenset(range(problem.nr_rows))
     for k in range(population_size):
         S, U = set(), set(I)
