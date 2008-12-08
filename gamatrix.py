@@ -60,6 +60,20 @@ def initial_solution(problem, population_size=1):
     return solution
 
 
+def ga(problem, nr_iterations=100, population_size=100):
+    population = [initial_solution(problem, population_size)
+                  for k in range(population_size)]
+    best = best_solution(population)
+    for t in range(nr_iterations):
+        P1, P2 = matching_selection(population)
+        C = uniform_crossover(P1, P2)
+        C = mutation(C, M_s, M_a, epsilon)
+        C = repair(C)
+        ranking_replacement(population, C)
+        best = best_solution([best_solution, C])
+    return best
+
+
     
 def main():
     from optparse import OptionParser
