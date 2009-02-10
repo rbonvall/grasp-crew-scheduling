@@ -64,14 +64,15 @@ def uniform_crossover(parent1, parent2):
     mask = random.randint(2, size=parent1.columns.size)
     return mask * parent1.columns + (1 - mask) * parent2.columns
 
-def mutation(columns, M_s=3, M_a=5, epsilon=0.5):
-    # static mutation
+def static_mutation(columns, M_s=3):
     for _ in range(M_s):
         j = randrange(columns.size)
         columns[j] = 1 - columns[j]
-     # adaptive mutation
-     # ...
     return columns
+
+def adaptive_mutation(columns, M_a=5, epsilon=0.5):
+    return columns
+
 
 def repair(solution):
     # ...
@@ -92,7 +93,8 @@ def ga(problem, population_size=100, nr_iterations=1000):
     for t in range(nr_iterations):
         p1, p2 = matching_selection(problem, population)
         child = uniform_crossover(population[p1], population[p2])
-        child = mutation(child)
+        child = static_mutation(child)
+        child = adaptive_mutation(child)
         child = repair(child)
         ranking_replacement(population, child)
         best_k = best_solution([best_solution, child])
