@@ -74,17 +74,17 @@ def best_solution(solutions):
 
     
 
-def ga(population_size, nr_iterations):
-    population = [construct_solution() for k in range(population_size)]
-    best = best_solution(population)
+def ga(problem, population_size=100, nr_iterations=1000):
+    population = [construct_solution(problem) for k in range(population_size)]
+    best_k = best_solution(population)
     for t in range(nr_iterations):
-        P1, P2 = matching_selection(population)
-        C = uniform_crossover(P1, P2)
-        C = mutation(C, M_s, M_a, epsilon)
-        C = repair(C)
-        ranking_replacement(population, C)
-        best = best_solution([best_solution, C])
-    return best
+        p1, p2 = matching_selection(problem, population)
+        child = uniform_crossover(population[p1], population[p2])
+        child = mutation(child)
+        child = repair(child)
+        ranking_replacement(population, child)
+        best_k = best_solution([best_solution, child])
+    return population[best_k]
 
     
    
