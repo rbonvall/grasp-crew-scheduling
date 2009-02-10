@@ -6,7 +6,7 @@
 #     Journal of Heuristics, 11: 323--357 (1998)
 
 from csp import CrewSchedulingProblem, namedtuple
-from random import choice
+from random import choice, randrange
 from numpy import dot, zeros, array, matrix, random, sum, abs
 from operator import attrgetter
 range = xrange
@@ -60,12 +60,18 @@ def matching_selection(problem, population):
     return (P1, P2)
 
 def uniform_crossover(parent1, parent2):
+    '''Columns of the child after crossover.'''
     mask = random.randint(2, size=parent1.columns.size)
     return mask * parent1.columns + (1 - mask) * parent2.columns
 
-def mutation(solution, M_s=3, M_a=5, epsilon=0.5):
-    # ...
-    return solution
+def mutation(columns, M_s=3, M_a=5, epsilon=0.5):
+    # static mutation
+    for _ in range(M_s):
+        j = randrange(columns.size)
+        columns[j] = 1 - columns[j]
+     # adaptive mutation
+     # ...
+    return columns
 
 def repair(solution):
     # ...
