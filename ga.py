@@ -108,7 +108,7 @@ def main():
     parser = OptionParser(usage="usage: %prog [options] [input_file]")
     (options, args) = parser.parse_args()
     if not args:
-        parser.print_help()
+        parser.print_usage()
         return
 
     problem = Problem(open(args[0]))
