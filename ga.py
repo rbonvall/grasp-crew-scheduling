@@ -22,8 +22,8 @@ class Problem:
                 column[task] = 1
             columns.append(column)
             costs.append(rotation.cost)
-        self.A = numpy.matrix(columns).transpose()
-        self.costs = numpy.array(costs)
+        self.A = matrix(columns).transpose()
+        self.costs = array(costs)
         self.nr_tasks, self.nr_rotations = self.A.shape
 
 Solution = namedtuple('Solution', 'columns covering fitness unfitness')
