@@ -113,6 +113,7 @@ def main():
         return
 
     problem = Problem(open(args[0]))
+    print ga(problem)
 
 if __name__ == '__main__':
     main()
