@@ -17,7 +17,7 @@ class Problem:
         csp = CrewSchedulingProblem(problem_file)
         columns, costs = [], []
         for rotation in csp.generate_rotations():
-            column = numpy.zeros(len(csp.tasks), dtype='int8')
+            column = zeros(len(csp.tasks), dtype='int8')
             for task in rotation.tasks:
                 column[task] = 1
             columns.append(column)
