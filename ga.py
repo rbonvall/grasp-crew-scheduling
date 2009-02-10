@@ -26,27 +26,13 @@ class Problem:
         self.costs = numpy.array(costs)
         self.nr_tasks, self.nr_rotations = self.A.shape
 
-class Solution:
-    __slots__ = ['columns', 'fitness', 'unfitness']
-    def __init__(self, columns, problem):
-        self.columns = numpy.array(columns).astype('int8')
-        self.fitness = fitness(problem, self.columns)
-        self.unfitness = unfitness(problem, self.columns)
-    def __eq__(self, other):
-        return (self.columns == other.columns).all()
-    def __neq__(self, other):
-        return not (self == other)
-    def __repr__(self):
-        return 'Solution(%s, f=%d, u=%d)' % (
-                str.join('', map(str, columns)), self.fitness, self.unfitness)
+Solution = namedtuple('Solution', 'columns covering fitness unfitness')
 
-def fitness(problem, solution):
-    return numpy.dot(problem.costs, solution)
-
-def unfitness(problem, solution):
-    w = numpy.dot(problem.A, solution)
-    return numpy.sum(numpy.abs(w - 1))
-
+def make_solution(problem, columns):
+    covering = dot(problem.A, columns)
+    fitness = dot(problem.costs, columns)
+    unfitness = sum(abs(covering - 1))
+    return Solution(columns, covering, fitness, unfitness)
 
 def construct_solution():
     # s = ...
