@@ -60,18 +60,22 @@ def uniform_crossover(P1, P2):
     child = mask * P1.columns + (1 - mask) * P2.columns
     return Solution(child)
 
-def mutation(solution, M_s, M_a, epsilon):
+
+def mutation(solution, M_s=3, M_a=5, epsilon=0.5):
+    # ...
     return solution
 
 def repair(solution):
+    # ...
     return solution
     
 def ranking_replacement(population, solution):
+    # ...
     return
 
-def best_solution(solutions):
-    return solutions[0]
-
+def best_solution(population):
+    # ...
+    return 0
     
 
 def ga(problem, population_size=100, nr_iterations=1000):
