@@ -24,6 +24,7 @@ class Problem:
             costs.append(rotation.cost)
         self.A = numpy.matrix(columns).transpose()
         self.costs = numpy.array(costs)
+        self.nr_tasks, self.nr_rotations = self.A.shape
 
 class Solution:
     __slots__ = ['columns', 'fitness', 'unfitness']
