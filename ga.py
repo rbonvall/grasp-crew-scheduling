@@ -7,7 +7,7 @@
 
 from csp import CrewSchedulingProblem, namedtuple
 from random import choice
-import numpy
+from numpy import dot, zeros, array, matrix, random, sum, abs
 from operator import attrgetter
 range = xrange
 
