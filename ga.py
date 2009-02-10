@@ -34,10 +34,10 @@ def make_solution(problem, columns):
     unfitness = sum(abs(covering - 1))
     return Solution(columns, covering, fitness, unfitness)
 
-def construct_solution():
-    # s = ...
-    return Solution(s)
-
+def construct_solution(problem):
+    # TODO: smarter solution construction
+    columns = random.randint(2, size=problem.nr_rotations).astype('int8')
+    return make_solution(problem, columns)
 
 def binary_tournament(population):
     candidates = [choice(population), choice(population)]
