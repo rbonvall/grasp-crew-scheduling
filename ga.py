@@ -7,7 +7,7 @@
 
 from csp import CrewSchedulingProblem, namedtuple
 from random import choice
-import numpy
+from numpy import dot, zeros, array, matrix, random, sum, abs
 from operator import attrgetter
 range = xrange
 
@@ -17,87 +17,80 @@ class Problem:
         csp = CrewSchedulingProblem(problem_file)
         columns, costs = [], []
         for rotation in csp.generate_rotations():
-            column = numpy.zeros(len(csp.tasks), dtype='int8')
+            column = zeros(len(csp.tasks), dtype='int8')
             for task in rotation.tasks:
                 column[task] = 1
             columns.append(column)
             costs.append(rotation.cost)
-        self.A = numpy.matrix(columns).transpose()
-        self.costs = numpy.array(costs)
+        self.A = matrix(columns).transpose()
+        self.costs = array(costs)
+        self.nr_tasks, self.nr_rotations = self.A.shape
 
-class Solution:
-    __slots__ = ['columns', 'fitness', 'unfitness']
-    def __init__(self, columns, problem):
-        self.columns = numpy.array(columns).astype('int8')
-        self.fitness = fitness(problem, self.columns)
-        self.unfitness = unfitness(problem, self.columns)
-    def __eq__(self, other):
-        return (self.columns == other.columns).all()
-    def __neq__(self, other):
-        return not (self == other)
-    def __repr__(self):
-        return 'Solution(%s, f=%d, u=%d)' % (
-                str.join('', map(str, columns)), self.fitness, self.unfitness)
+Solution = namedtuple('Solution', 'columns covering fitness unfitness')
 
-def fitness(problem, solution):
-    return numpy.dot(problem.costs, solution)
+def make_solution(problem, columns):
+    covering = dot(problem.A, columns)
+    fitness = dot(problem.costs, columns)
+    unfitness = sum(abs(covering - 1))
+    return Solution(columns, covering, fitness, unfitness)
 
-def unfitness(problem, solution):
-    w = numpy.dot(problem.A, solution)
-    return numpy.sum(numpy.abs(w - 1))
-
-
-def construct_solution():
-    # s = ...
-    return Solution(s)
-
+def construct_solution(problem):
+    # TODO: smarter solution construction
+    columns = random.randint(2, size=problem.nr_rotations).astype('int8')
+    return make_solution(problem, columns)
 
 def binary_tournament(population):
-    candidates = [choice(population), choice(population)]
-    return min(candidates, key=attrgetter('fitness')) 
+    population_size = len(population)
+    candidates = [randrange(population_size) for _ in range(2)]
+    return min(candidates, key=lambda index: population[index].fitness)
 
-def most_compatible(population, P1):
-    #P2 = ...
-    return P2
-
-def matching_selection(population):
+def matching_selection(problem, population):
+    '''Indices of the solutions selected for crossover.'''
     P1 = binary_tournament(population)
-    if P1.unfitness == 0:
+    if population[P1].unfitness == 0:
         P2 = binary_tournament(population)
     else:
-        P2 = most_compatible(population, P1)
+        cols_P1 = population[P1].columns
+        def compatibility(k):
+            cols_Pk = population[k].columns
+            comp = sum(cols_P1 | cols_Pk) - sum(cols_P1 & cols_Pk)
+            return comp, population[P1].fitness  # use fitness to break ties
+        P2 = max((k for k, sol in enumerate(population) if k != P1),
+                 key=compatibility)
     return (P1, P2)
 
-def uniform_crossover(P1, P2):
-    mask = numpy.random.randint(2, size=P1.size)
-    child = mask * P1.columns + (1 - mask) * P2.columns
-    return Solution(child)
+def uniform_crossover(parent1, parent2):
+    mask = random.randint(2, size=parent1.columns.size)
+    return mask * parent1.columns + (1 - mask) * parent2.columns
 
-def mutation(solution, M_s, M_a, epsilon):
+def mutation(solution, M_s=3, M_a=5, epsilon=0.5):
+    # ...
     return solution
 
 def repair(solution):
+    # ...
     return solution
     
 def ranking_replacement(population, solution):
+    # ...
     return
 
-def best_solution(solutions):
-    return solutions[0]
-
+def best_solution(population):
+    # ...
+    return 0
     
 
-def ga(population_size, nr_iterations):
-    population = [construct_solution() for k in range(population_size)]
-    best = best_solution(population)
+def ga(problem, population_size=100, nr_iterations=1000):
+    population = [construct_solution(problem) for k in range(population_size)]
+    best_k = best_solution(population)
     for t in range(nr_iterations):
-        P1, P2 = matching_selection(population)
-        C = uniform_crossover(P1, P2)
-        C = mutation(C, M_s, M_a, epsilon)
-        C = repair(C)
-        ranking_replacement(population, C)
-        best = best_solution([best_solution, C])
-    return best
+        p1, p2 = matching_selection(problem, population)
+        child = uniform_crossover(population[p1], population[p2])
+        child = mutation(child)
+        child = repair(child)
+        ranking_replacement(population, child)
+        best_k = best_solution([best_solution, child])
+    return population[best_k]
 
     
    
