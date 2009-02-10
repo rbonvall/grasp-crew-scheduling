@@ -40,19 +40,23 @@ def construct_solution(problem):
     return make_solution(problem, columns)
 
 def binary_tournament(population):
-    candidates = [choice(population), choice(population)]
-    return min(candidates, key=attrgetter('fitness')) 
+    population_size = len(population)
+    candidates = [randrange(population_size) for _ in range(2)]
+    return min(candidates, key=lambda index: population[index].fitness)
 
-def most_compatible(population, P1):
-    #P2 = ...
-    return P2
-
-def matching_selection(population):
+def matching_selection(problem, population):
+    '''Indices of the solutions selected for crossover.'''
     P1 = binary_tournament(population)
-    if P1.unfitness == 0:
+    if population[P1].unfitness == 0:
         P2 = binary_tournament(population)
     else:
-        P2 = most_compatible(population, P1)
+        cols_P1 = population[P1].columns
+        def compatibility(k):
+            cols_Pk = population[k].columns
+            comp = sum(cols_P1 | cols_Pk) - sum(cols_P1 & cols_Pk)
+            return comp, population[P1].fitness  # use fitness to break ties
+        P2 = max((k for k, sol in enumerate(population) if k != P1),
+                 key=compatibility)
     return (P1, P2)
 
 def uniform_crossover(parent1, parent2):
