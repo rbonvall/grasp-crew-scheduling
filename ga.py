@@ -55,11 +55,9 @@ def matching_selection(population):
         P2 = most_compatible(population, P1)
     return (P1, P2)
 
-def uniform_crossover(P1, P2):
-    mask = numpy.random.randint(2, size=P1.size)
-    child = mask * P1.columns + (1 - mask) * P2.columns
-    return Solution(child)
-
+def uniform_crossover(parent1, parent2):
+    mask = random.randint(2, size=parent1.columns.size)
+    return mask * parent1.columns + (1 - mask) * parent2.columns
 
 def mutation(solution, M_s=3, M_a=5, epsilon=0.5):
     # ...
