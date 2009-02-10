@@ -7,7 +7,7 @@
 
 from csp import CrewSchedulingProblem, namedtuple
 from random import choice, randrange
-from numpy import dot, zeros, array, matrix, random, sum, abs
+from numpy import dot, zeros, array, matrix, random, sum, abs, transpose
 from operator import attrgetter
 range = xrange
 
@@ -22,9 +22,26 @@ class Problem:
                 column[task] = 1
             columns.append(column)
             costs.append(rotation.cost)
-        self.A = matrix(columns).transpose()
+
+        A = array(columns).transpose()
+        m, n = A.shape
+
+        alpha = [set() for row in range(m)]
+        beta =  [set() for col in range(n)]
+        for row, col in transpose(A.nonzero()):
+            alpha[row].add(col)
+            beta [col].add(row)
+
+        self.A = A
         self.costs = array(costs)
-        self.nr_tasks, self.nr_rotations = self.A.shape
+        self.nr_tasks, self.nr_rotations = m, n
+        self.alpha = map(frozenset, alpha)
+        self.beta  = map(frozenset, beta)
+
+    def __repr__(self):
+        return '<CSP problem, %dx%d>' % (self.nr_tasks, self.nr_rotations)
+
+
 
 Solution = namedtuple('Solution', 'columns covering fitness unfitness')
 
