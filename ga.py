@@ -51,9 +51,20 @@ def make_solution(problem, columns):
     unfitness = sum(abs(covering - 1))
     return Solution(columns, covering, fitness, unfitness)
 
-def construct_solution(problem):
-    # TODO: smarter solution construction
-    columns = random.randint(2, size=problem.nr_rotations).astype('uint8')
+def initial_solution(problem):
+    columns = zeros(problem.nr_rotations, dtype='uint8')
+    I = frozenset(range(problem.nr_tasks))
+    S, U = set(), set(I)
+    while U:
+        i = choice(list(U))
+        J = [j for j in problem.alpha[i] if not (problem.beta[j] & (I - U))]
+        if J:
+            j = choice(J)
+            columns[j] = 1
+            U -= problem.beta[j]
+        else:
+            U.remove(i)
+    #columns = random.randint(2, size=problem.nr_rotations).astype('uint8')
     return make_solution(problem, columns)
 
 def binary_tournament(population):
@@ -105,7 +116,7 @@ def best_solution(population):
     
 
 def ga(problem, population_size=100, nr_iterations=1000):
-    population = [construct_solution(problem) for k in range(population_size)]
+    population = [initial_solution(problem) for k in range(population_size)]
     best_k = best_solution(population)
     for t in range(nr_iterations):
         p1, p2 = matching_selection(problem, population)
