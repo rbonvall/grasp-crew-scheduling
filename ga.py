@@ -17,7 +17,7 @@ class Problem:
         csp = CrewSchedulingProblem(problem_file)
         columns, costs = [], []
         for rotation in csp.generate_rotations():
-            column = zeros(len(csp.tasks), dtype='int8')
+            column = zeros(len(csp.tasks), dtype='uint8')
             for task in rotation.tasks:
                 column[task] = 1
             columns.append(column)
@@ -36,7 +36,7 @@ def make_solution(problem, columns):
 
 def construct_solution(problem):
     # TODO: smarter solution construction
-    columns = random.randint(2, size=problem.nr_rotations).astype('int8')
+    columns = random.randint(2, size=problem.nr_rotations).astype('uint8')
     return make_solution(problem, columns)
 
 def binary_tournament(population):
