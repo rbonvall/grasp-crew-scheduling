@@ -148,8 +148,11 @@ def ga(problem, population_size=100, nr_iterations=1000):
         child = static_mutation(child)
         child = adaptive_mutation(child)
         child = repair(child)
-        ranking_replacement(population, child)
-        best_k = best_solution([best_solution, child])
+        child = make_solution(problem, child)
+        child_k = ranking_replacement(population, child)
+        if best_solution([population[best_k], child]) == 1:
+            best_k = child_k
+            print "Found better child!"
     return population[best_k]
 
     
