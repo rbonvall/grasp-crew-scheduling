@@ -133,8 +133,10 @@ def ranking_replacement(population, child):
 
 
 def best_solution(population):
-    # ...
-    return 0
+    sort_key = lambda (k, sol): (sol.unfitness, sol.fitness)
+    best_k, best_sol = min(((k, sol) for k, sol in enumerate(population)),
+        key=sort_key)
+    return best_k
     
 
 def ga(problem, population_size=100, nr_iterations=1000):
