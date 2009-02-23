@@ -108,27 +108,28 @@ def repair(solution):
     return solution
     
 def ranking_replacement(population, child):
-    # Labels for solutions according to relation with child.
-    # Keys are pairs: (better fitness than child?, better unfitness than child?)
-    groups = {
-        (False, False): 1, (True, False): 2,
-        (False, True):  3, (True, True):  4,
-    }
-    solution_group = (groups[solution.fitness   < child.fitness,
-                             solution.unfitness < child.unfitness]
-                      for solution in population)
-
     # replacement criteria:
     # 1. group with smallest label
     # 2. worst unfitness
     # 3. worst fitness
     sort_key = lambda (k, (sol, group)): (group, -sol.unfitness, -sol.fitness)
     worst_k, (worst_sol, worst_group) = min(
-        ((k, (sol, group)) for k, (sol, group) in enumerate(zip(population, solution_group))),
+        ((k, (sol, group)) for k, (sol, group) in enumerate(zip(population, replacement_groups(population, child)))),
         key=sort_key)
 
     population[worst_k] = child
     return worst_k
+
+def replacement_groups(population, child):
+    # Labels for solutions according to relation with child.
+    # Keys are pairs: (better fitness than child?, better unfitness than child?)
+    groups = {
+        (False, False): 1, (True, False): 2,
+        (False, True):  3, (True, True):  4,
+    }
+    for solution in population:
+        yield groups[solution.fitness   < child.fitness,
+                     solution.unfitness < child.unfitness]
 
 
 
