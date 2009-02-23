@@ -140,27 +140,57 @@ def best_solution(population):
     return best_k
     
 
-def ga(problem, population_size=100, nr_iterations=1000):
+def ga(problem, population_size=100, nr_iterations=1000, debug=False):
     population = [initial_solution(problem) for k in range(population_size)]
     best_k = best_solution(population)
+
+    if debug:
+        print "Population:"
+        for solution in population:
+            print ''.join(map(str, solution.columns)),
+            print ''.join(map(str, solution.covering)),
+            print solution.fitness,
+            print solution.unfitness
+        print "Best solution:", best_k
+
     for t in range(nr_iterations):
+        if debug: print "Iteration: %d" % t
+
         p1, p2 = matching_selection(problem, population)
         child_columns = uniform_crossover(population[p1], population[p2])
+        if debug:
+            print "Parents: %d %d" % (p1, p2)
+            print "Child columns:", ''.join(map(str, child_columns))
 
         bits_to_mutate = static_mutation_bits(child_columns)
         for bit in bits_to_mutate:
             child_columns[bit] = 1 - child_columns[bit]
+        if debug:
+            print "Static mutation bits:", map(str, bits_to_mutate)
 
         bits_to_mutate = adaptive_mutation_bits(child_columns)
         for bit in bits_to_mutate:
             child_columns[bit] = 1 - child_columns[bit]
+        if debug:
+            print "Adaptive mutation bits:", map(str, bits_to_mutate)
 
         child_columns = repair(child_columns)
+        if debug:
+            print "Repaired child:",
+            print ''.join(map(str, child_columns)),
+            print ''.join(map(str, child.covering)),
+            print child.fitness,
+            print child.unfitness
+
         child = make_solution(problem, child_columns)
         child_k = ranking_replacement(population, child)
+        if debug:
+            print "Solution to replace: %d" % child_k
+
         if best_solution([population[best_k], child]) == 1:
             best_k = child_k
-            print "Found better child!"
+            if debug:
+                print "New solution is better"
     return population[best_k]
 
     
@@ -170,13 +200,14 @@ def ga(problem, population_size=100, nr_iterations=1000):
 def main():
     from optparse import OptionParser
     parser = OptionParser(usage="usage: %prog [options] [input_file]")
+    parser.add_option('--debug', action='store_true', help='Print debugging data')
     (options, args) = parser.parse_args()
     if not args:
         parser.print_usage()
         return
 
     problem = Problem(open(args[0]))
-    print ga(problem)
+    print ga(problem, debug=options.debug)
 
 if __name__ == '__main__':
     main()
