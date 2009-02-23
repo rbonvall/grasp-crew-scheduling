@@ -175,14 +175,14 @@ def ga(problem, population_size=100, nr_iterations=1000, debug=False):
             print "Adaptive mutation bits:", map(str, bits_to_mutate)
 
         child_columns = repair(child_columns)
+        child = make_solution(problem, child_columns)
         if debug:
             print "Repaired child:",
-            print ''.join(map(str, child_columns)),
+            print ''.join(map(str, child.columns)),
             print ''.join(map(str, child.covering)),
             print child.fitness,
             print child.unfitness
 
-        child = make_solution(problem, child_columns)
         child_k = ranking_replacement(population, child)
         if debug:
             print "Solution to replace: %d" % child_k
