@@ -146,11 +146,11 @@ def ga(problem, population_size=100, nr_iterations=1000):
         p1, p2 = matching_selection(problem, population)
         child_columns = uniform_crossover(population[p1], population[p2])
 
-        bits_to_mutate = static_mutation_bits(child)
+        bits_to_mutate = static_mutation_bits(child_columns)
         for bit in bits_to_mutate:
             child_columns[bit] = 1 - child_columns[bit]
 
-        bits_to_mutate = adaptive_mutation_bits(child)
+        bits_to_mutate = adaptive_mutation_bits(child_columns)
         for bit in bits_to_mutate:
             child_columns[bit] = 1 - child_columns[bit]
 
