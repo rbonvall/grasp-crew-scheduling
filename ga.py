@@ -93,14 +93,14 @@ def uniform_crossover(parent1, parent2):
     mask = random.randint(2, size=parent1.columns.size)
     return mask * parent1.columns + (1 - mask) * parent2.columns
 
-def static_mutation(columns, M_s=3):
-    for _ in range(M_s):
-        j = randrange(columns.size)
-        columns[j] = 1 - columns[j]
-    return columns
+def static_mutation_bits(columns, M_s=3):
+    bits = set()
+    while len(bits) < M_s:
+        bits.add(randrange(columns.size))
+    return bits
 
-def adaptive_mutation(columns, M_a=5, epsilon=0.5):
-    return columns
+def adaptive_mutation_bits(columns, M_a=5, epsilon=0.5):
+    return set()
 
 
 def repair(solution):
@@ -144,11 +144,18 @@ def ga(problem, population_size=100, nr_iterations=1000):
     best_k = best_solution(population)
     for t in range(nr_iterations):
         p1, p2 = matching_selection(problem, population)
-        child = uniform_crossover(population[p1], population[p2])
-        child = static_mutation(child)
-        child = adaptive_mutation(child)
-        child = repair(child)
-        child = make_solution(problem, child)
+        child_columns = uniform_crossover(population[p1], population[p2])
+
+        bits_to_mutate = static_mutation_bits(child)
+        for bit in bits_to_mutate:
+            child_columns[bit] = 1 - child_columns[bit]
+
+        bits_to_mutate = adaptive_mutation_bits(child)
+        for bit in bits_to_mutate:
+            child_columns[bit] = 1 - child_columns[bit]
+
+        child_columns = repair(child_columns)
+        child = make_solution(problem, child_columns)
         child_k = ranking_replacement(population, child)
         if best_solution([population[best_k], child]) == 1:
             best_k = child_k
